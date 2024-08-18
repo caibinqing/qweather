@@ -6,7 +6,7 @@ import math
 from aiohttp import ClientSession
 
 from .const import (
-    AirNow,
+    AirQualityNow,
     DailyForecast,
     HourlyForecast,
     IndicesDailyItem,
@@ -28,44 +28,40 @@ class QWeatherClient:
         session: ClientSession,
         api_key: str,
         location: str,  # longitude,latitude
+        location_id: str,
         gird_weather: bool,
     ) -> None:
         super().__init__()
         self.http = session
         self.params = {"location": location, "key": api_key}
+        self.location_id = location_id
         self.weather_type = "grid-weather" if gird_weather else "weather"
-
-    async def city_lookup(self) -> str:
-        """城市搜索-城市信息查询"""
-        geo_url = "https://geoapi.qweather.com/v2/city/lookup"
-        if json_data := await self.url_get(geo_url, self.params):
-            if locations := json_data.get("location"):
-                return locations[0].get("name", "未知")
-        return "未知"
 
     async def update_observation(self) -> RealtimeWeather | None:
         """城市天气/格点天气 - 实时天气"""
-        json_data = await self.api_get(f"{self.weather_type}/now")
+        json_data = await self.api_get_v7(f"{self.weather_type}/now")
         return json_data.get("now") if json_data else None
 
     async def update_daily_forecast(self) -> list[DailyForecast]:
         """城市天气/格点天气 - 每日天气预报"""
-        json_data = await self.api_get(f"{self.weather_type}/7d")
+        json_data = await self.api_get_v7(f"{self.weather_type}/7d")
         return json_data.get("daily", []) if json_data else []
 
     async def update_hourly_forecast(self) -> list[HourlyForecast]:
         """城市天气/格点天气 - 逐小时天气预报"""
-        json_data = await self.api_get(f"{self.weather_type}/24h")
+        json_data = await self.api_get_v7(f"{self.weather_type}/24h")
         return json_data.get("hourly") if json_data else []
 
-    async def update_air_now(self) -> AirNow | None:
+    async def update_air_now(self) -> AirQualityNow | None:
         """空气质量-实时空气质量"""
-        json_data = await self.api_get("air/now")
+        if not self.location_id:
+            return None
+        json_data = await self.api_get(f"airquality/v1/now/{self.location_id}")
         return json_data.get("now") if json_data else None
 
     async def update_minutely_precipitation(self) -> MinutelyPrecipitation:
         """分钟预报-分钟级降水"""
-        json_data = await self.api_get("minutely/5m")
+        json_data = await self.api_get_v7("minutely/5m")
         return (
             {
                 "summary": json_data.get("summary", ""),
@@ -77,18 +73,23 @@ class QWeatherClient:
 
     async def update_warning_now(self) -> list[WeatherWarning]:
         """预警-天气灾害预警"""
-        json_data = await self.api_get("warning/now")
+        json_data = await self.api_get_v7("warning/now")
         return json_data.get("warning", []) if json_data else []
 
     async def update_indices_1d(self) -> list[IndicesDailyItem]:
         """天气指数-天气指数预报"""
-        json_data = await self.api_get("indices/1d", {"type": "0"})
+        json_data = await self.api_get_v7("indices/1d", {"type": "0"})
         return json_data.get("daily") if json_data else []
+
+    async def api_get_v7(
+        self, api: str, extra_params: Mapping[str, str] | None = None
+    ) -> dict | None:
+        return await self.url_get(f"{self.dev_api_v7}/{api}", extra_params)
 
     async def api_get(
         self, api: str, extra_params: Mapping[str, str] | None = None
     ) -> dict | None:
-        return await self.url_get(f"{self.dev_api_v7}/{api}", extra_params)
+        return await self.url_get(f"https://devapi.qweather.com/{api}", extra_params)
 
     async def url_get(
         self, url: str, extra_params: Mapping[str, str] | None = None

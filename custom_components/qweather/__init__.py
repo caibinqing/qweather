@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import QWeatherClient
-from .const import CONF_GIRD
+from .const import CONF_GIRD, CONF_LOCATION_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -34,9 +34,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: QWeatherConfigEntry) -> 
     longitude: float = round(entry.data[CONF_LONGITUDE], 2)
     latitude: float = round(entry.data[CONF_LATITUDE], 2)
     gird_weather: bool = entry.options.get(CONF_GIRD, True)
+    location_id = entry.data[CONF_LOCATION_ID]
 
     session = async_create_clientsession(hass, timeout=ClientTimeout(total=20))
-    client = QWeatherClient(session, api_key, f"{longitude},{latitude}", gird_weather)
+    client = QWeatherClient(session, api_key, f"{longitude},{latitude}", location_id, gird_weather)
     entry.runtime_data = coordinators = Coordinators(hass, client)
 
     for coordinator in coordinators.__dict__.values():

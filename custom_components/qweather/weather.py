@@ -33,9 +33,9 @@ import homeassistant.util.dt as dt_util
 from . import Coordinators, QWeatherConfigEntry
 from .const import (
     ATTRIBUTION,
+    AirQualityNow,
     DOMAIN,
     MANUFACTURER,
-    AirNow,
     DailyForecast,
     HourlyForecast,
     RealtimeWeather,
@@ -220,8 +220,13 @@ class QWeatherEntity(CoordinatorWeatherEntity):
         self.async_write_ha_state()
 
     @callback
-    def _update_air_now(self, air_now: AirNow | None):
-        self._attr_ozone = maybe_float(air_now.get("o3")) if air_now else None
+    def _update_air_now(self, air_now: AirQualityNow | None) -> None:
+        if air_now:
+            for pollutant in air_now["pollutant"]:
+                if pollutant["code"] == "o3":
+                    self._attr_ozone = pollutant["concentration"]["value"]
+                    return
+        self._attr_ozone = None
 
     @callback
     def _update_extra_weather_now(self, weather_now: RealtimeWeather | None):
