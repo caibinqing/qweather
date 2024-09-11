@@ -184,6 +184,4 @@ class IndicesDailyItem(TypedDict):
     name: str  # "运动指数"
     level: str  # "3"
     category: str  # "较不宜"
-    text: (
-        str | None
-    )  # "天气较好，但考虑天气寒冷，风力较强，推荐您进行室内运动，若户外运动请注意保暖并做好准备活动。
+    text: str | None  # "天气较好，但考虑天气寒冷，风力较强，推荐您进行室内运动，若户外运动请注意保暖并做好准备活动。

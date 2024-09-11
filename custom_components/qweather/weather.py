@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from homeassistant.components.weather import (
     ATTR_CONDITION_CLEAR_NIGHT,
@@ -68,9 +67,7 @@ class QWeatherEntity(CoordinatorWeatherEntity):
     _attr_attribution: str | None = ATTRIBUTION
     _attr_has_entity_name: bool = True
     _attr_name: str | None = None
-    _attr_supported_features: int | None = (
-        WeatherEntityFeature.FORECAST_DAILY | WeatherEntityFeature.FORECAST_HOURLY
-    )
+    _attr_supported_features: int | None = WeatherEntityFeature.FORECAST_DAILY | WeatherEntityFeature.FORECAST_HOURLY
 
     _attr_precision: float = 1
     _attr_native_pressure_unit: str | None = UnitOfPressure.HPA
@@ -107,11 +104,7 @@ class QWeatherEntity(CoordinatorWeatherEntity):
     async def async_added_to_hass(self) -> None:
         """When entity is added to hass."""
         await super().async_added_to_hass()
-        self.async_on_remove(
-            self.coordinators.air_now.async_add_listener(
-                self._handle_air_now_coordinator_update
-            )
-        )
+        self.async_on_remove(self.coordinators.air_now.async_add_listener(self._handle_air_now_coordinator_update))
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -128,9 +121,7 @@ class QWeatherEntity(CoordinatorWeatherEntity):
         self._attr_cloud_coverage = maybe_int(weather_now.get("cloud"))
         self._attr_wind_bearing = maybe_float(weather_now.get("wind360"))
         self._attr_native_pressure = maybe_float(weather_now.get("pressure"))
-        self._attr_native_apparent_temperature = maybe_float(
-            weather_now.get("feelsLike")
-        )
+        self._attr_native_apparent_temperature = maybe_float(weather_now.get("feelsLike"))
         self._attr_native_temperature = maybe_float(weather_now.get("temp"))
         self._attr_native_visibility = maybe_float(weather_now.get("vis"))
         # self._attr_native_wind_gust_speed

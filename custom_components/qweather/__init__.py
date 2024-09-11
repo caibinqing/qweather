@@ -52,9 +52,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: QWeatherConfigEntry) ->
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
-async def entry_update_listener(
-    hass: HomeAssistant, entry: QWeatherConfigEntry
-) -> None:
+async def entry_update_listener(hass: HomeAssistant, entry: QWeatherConfigEntry) -> None:
     # https://developers.home-assistant.io/docs/config_entries_options_flow_handler/#signal-updates
     _LOGGER.debug("[%s] Options updated: %s", entry.unique_id, entry.options)
     await hass.config_entries.async_reload(entry.entry_id)
