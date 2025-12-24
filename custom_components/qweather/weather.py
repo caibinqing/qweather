@@ -17,28 +17,14 @@ from homeassistant.components.weather import (
     Forecast,
     WeatherEntityFeature,
 )
-from homeassistant.const import (
-    CONF_NAME,
-    UnitOfLength,
-    UnitOfPressure,
-    UnitOfSpeed,
-    UnitOfTemperature,
-)
+from homeassistant.const import CONF_NAME, UnitOfLength, UnitOfPressure, UnitOfSpeed, UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 import homeassistant.util.dt as dt_util
 
 from . import Coordinators, QWeatherConfigEntry
-from .const import (
-    ATTRIBUTION,
-    AirQualityNow,
-    DOMAIN,
-    MANUFACTURER,
-    DailyForecast,
-    HourlyForecast,
-    RealtimeWeather,
-)
+from .const import ATTRIBUTION, DOMAIN, MANUFACTURER, AirQualityNow, DailyForecast, HourlyForecast, RealtimeWeather
 
 _LOGGER = logging.getLogger(__name__)
 

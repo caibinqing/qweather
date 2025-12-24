@@ -1,14 +1,14 @@
 {
   "domain": "qweather",
   "name": "和风天气",
-  "codeowners": ["@Necroneco"],
+  "codeowners": ["@caibinqing"],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/Necroneco/qweather",
+  "documentation": "https://github.com/caibinqing/qweather",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/Necroneco/qweather/issues",
+  "issue_tracker": "https://github.com/caibinqing/qweather/issues",
   "requirements": [],
   "single_config_entry": true,
-  "version": "1.0.0"
+  "version": "2.0.0"
 }
