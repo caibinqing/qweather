@@ -2,6 +2,7 @@ from collections.abc import Callable
 from datetime import date, datetime
 from decimal import Decimal
 import logging
+from slugify import slugify
 from typing import Generic, TypeVar
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
@@ -60,7 +61,7 @@ class QSensor(CoordinatorEntity, SensorEntity, Generic[_DataT]):
         self.value_func = value_func
 
         self._attr_unique_id = f"{config_entry.unique_id}_{description.key}"
-        self.entity_id = f"{Platform.SENSOR}.{config_entry.data[CONF_NAME]}_{description.key}"
+        self.entity_id = f"{Platform.SENSOR}.{slugify(config_entry.data[CONF_NAME], separator="_")}_{description.key}"
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, config_entry.unique_id)})
 
         self._async_update_attrs(self.coordinator.data)
