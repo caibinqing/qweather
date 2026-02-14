@@ -10,7 +10,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 
-from .const import CONF_API_HOST, CONF_GIRD, CONF_LOCATION_ID, DOMAIN
+from .const import CONF_API_HOST, CONF_GRID, CONF_LOCATION_ID, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
             api_host = user_input.get(CONF_API_HOST, "")
             longitude = round(user_input[CONF_LONGITUDE], 2)
             latitude = round(user_input[CONF_LATITUDE], 2)
-            use_grid = user_input.get(CONF_GIRD, True)
+            use_grid = user_input.get(CONF_GRID, True)
 
             await self.async_set_unique_id(f"{longitude}_{latitude}".replace(".", "_"))
             self._abort_if_unique_id_configured()
@@ -52,7 +52,7 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
                             CONF_LOCATION_ID: location_id,
                         },
                         options={
-                            CONF_GIRD: use_grid,
+                            CONF_GRID: use_grid,
                         },
                     )
 
@@ -70,7 +70,7 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_LONGITUDE, default=my.longitude): cv.longitude,
                     vol.Required(CONF_LATITUDE, default=my.latitude): cv.latitude,
                     vol.Required(CONF_NAME, default=my.location_name): str,
-                    vol.Optional(CONF_GIRD, default=True): bool,
+                    vol.Optional(CONF_GRID, default=True): bool,
                 }
             ),
             errors=errors,
@@ -88,7 +88,7 @@ class QWeatherOptionsFlow(OptionsFlow):
 
     def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize Qweather options flow."""
-        self.use_grid = config_entry.options.get(CONF_GIRD, False)
+        self.use_grid = config_entry.options.get(CONF_GRID, False)
 
     async def async_step_init(self, user_input=None) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
@@ -101,7 +101,7 @@ class QWeatherOptionsFlow(OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(CONF_GIRD, default=self.use_grid): bool,
+                    vol.Optional(CONF_GRID, default=self.use_grid): bool,
                 }
             ),
         )

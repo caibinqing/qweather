@@ -31,14 +31,14 @@ class QWeatherClient:
         api_key: str,
         location: str,  # longitude,latitude
         location_id: str,
-        gird_weather: bool,
+        grid_weather: bool,
     ) -> None:
         super().__init__()
         self.api_host = api_host
         self.http = session
         self.params = {"location": location, "key": api_key}
         self.location_id = location_id
-        self.weather_type = "grid-weather" if gird_weather else "weather"
+        self.weather_type = "grid-weather" if grid_weather else "weather"
 
     async def update_observation(self) -> RealtimeWeather | None:
         """城市天气/格点天气 - 实时天气"""
@@ -53,7 +53,7 @@ class QWeatherClient:
     async def update_hourly_forecast(self) -> list[HourlyForecast]:
         """城市天气/格点天气 - 逐小时天气预报"""
         json_data = await self.api_get_v7(f"{self.weather_type}/24h")
-        return json_data.get("hourly") if json_data else []
+        return json_data.get("hourly", []) if json_data else []
 
     async def update_air_now(self) -> AirQualityNow | None:
         """空气质量-实时空气质量"""

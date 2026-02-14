@@ -6,7 +6,9 @@ ATTRIBUTION = "Data provided by Qweather"
 MANUFACTURER = "Qweather, Inc."
 
 CONF_API_HOST = "api_host"
-CONF_GIRD = "grid_weather"
+CONF_GRID = "grid_weather"
+# Backward-compatible alias for historical misspelling.
+CONF_GIRD = CONF_GRID
 CONF_LOCATION_ID = "location_id"
 
 

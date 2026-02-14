@@ -9,7 +9,7 @@
                     "name" : "名称",
                     "api_key": "API Key",
                     "longitude" : "经度（保留两位小数）",
-                    "latitude" : "维度（保留两位小数）",
+                    "latitude" : "纬度（保留两位小数）",
                     "grid_weather": "是否使用格点天气，不选中则使用城市天气"
                 }
             }
