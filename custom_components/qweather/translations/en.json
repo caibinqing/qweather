@@ -20,7 +20,7 @@
     },
     "options": {
         "step": {
-            "user":{
+            "init":{
                 "data": {
                     "grid_weather": "Browse all grid level Weather APIs around the world, including real-time weather, forecast weather and minute-level precipitation at any latitude and longitude."
                 },
