@@ -74,6 +74,9 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
                 }
             ),
             errors=errors,
+            description_placeholders={
+                "link": "https://console.qweather.com/#/apps"
+            }
         )
 
     @staticmethod

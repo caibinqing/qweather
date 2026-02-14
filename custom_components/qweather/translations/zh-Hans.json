@@ -4,7 +4,7 @@
         "step": {
             "user": {
                 "title": "和风天气",
-                "description": "API Key: https://console.qweather.com/#/apps",
+                "description": "API Key: {link}",
                 "data": {
                     "name" : "名称",
                     "api_key": "API Key",
