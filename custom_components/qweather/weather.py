@@ -130,7 +130,7 @@ class QWeatherEntity(CoordinatorWeatherEntity):
                 datetime=daily.get("fxDate"),
                 humidity=maybe_float(daily.get("humidity")),
                 # precipitation_probability=,
-                cloud_coverage=maybe_float(daily.get("cloud")),
+                cloud_coverage=maybe_int(daily.get("cloud")),
                 native_precipitation=maybe_float(daily.get("precip")),
                 native_pressure=maybe_float(daily.get("pressure")),
                 native_temperature=maybe_float(daily.get("tempMax")),
@@ -163,7 +163,7 @@ class QWeatherEntity(CoordinatorWeatherEntity):
                 datetime=hourly.get("fxTime"),
                 humidity=maybe_float(hourly.get("humidity")),
                 precipitation_probability=maybe_int(hourly.get("pop")),
-                cloud_coverage=maybe_float(hourly.get("cloud")),
+                cloud_coverage=maybe_int(hourly.get("cloud")),
                 native_precipitation=maybe_float(hourly.get("precip")),
                 native_pressure=maybe_float(hourly.get("pressure")),
                 native_temperature=maybe_float(hourly.get("temp")),
@@ -286,7 +286,7 @@ CONDITION_MAP = {
 # region Utils
 
 
-def maybe_int(s: int | None) -> int | None:
+def maybe_int(s: str | None) -> int | None:
     return None if s is None else int(s)
 
 
