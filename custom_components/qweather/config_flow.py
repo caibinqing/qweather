@@ -38,23 +38,22 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
             if resp.status == HTTPStatus.OK:
                 json_data = await resp.json()
                 _LOGGER.debug(json_data)
-                if locations := json_data.get("location"):
-                    location_id = locations[0].get("id")
-                    # noinspection PyTypeChecker
-                    return self.async_create_entry(
-                        title=user_input[CONF_NAME],
-                        data={
-                            CONF_API_HOST: api_host,
-                            CONF_NAME: user_input[CONF_NAME],
-                            CONF_API_KEY: user_input[CONF_API_KEY],
-                            CONF_LONGITUDE: user_input[CONF_LONGITUDE],
-                            CONF_LATITUDE: user_input[CONF_LATITUDE],
-                            CONF_LOCATION_ID: location_id,
-                        },
-                        options={
-                            CONF_GRID: use_grid,
-                        },
-                    )
+                location_id = json_data["location"][0]["id"]
+                # noinspection PyTypeChecker
+                return self.async_create_entry(
+                    title=user_input[CONF_NAME],
+                    data={
+                        CONF_API_HOST: api_host,
+                        CONF_NAME: user_input[CONF_NAME],
+                        CONF_API_KEY: user_input[CONF_API_KEY],
+                        CONF_LONGITUDE: user_input[CONF_LONGITUDE],
+                        CONF_LATITUDE: user_input[CONF_LATITUDE],
+                        CONF_LOCATION_ID: location_id,
+                    },
+                    options={
+                        CONF_GRID: use_grid,
+                    },
+                )
 
             _LOGGER.warning("Failed to communicate with QWeather: %s", resp.status)
             errors["base"] = "communication"
