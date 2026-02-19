@@ -125,7 +125,7 @@ class QWeatherClient:
             self._wait_until = math.inf
             return None
         if response.status == HTTPStatus.NOT_FOUND:
-            _LOGGER.error("404 查询的数据或地区不存在。")
+            _LOGGER.error("404 查询的数据或地区不存在。 %s", url)
             self._wait_until = math.inf
             return None
         if response.status == HTTPStatus.TOO_MANY_REQUESTS:
