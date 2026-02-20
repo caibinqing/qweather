@@ -7,7 +7,6 @@ MANUFACTURER = "Qweather, Inc."
 
 CONF_API_HOST = "api_host"
 CONF_GRID = "grid_weather"
-CONF_LOCATION_ID = "location_id"
 
 
 class RealtimeWeather(TypedDict):
@@ -81,20 +80,17 @@ class HourlyForecast(TypedDict):
     dew: str | None  # "-25"
 
 
-# class AirNow(TypedDict):
-#     """https://dev.qweather.com/docs/api/air/air-now/"""
-#
-#     pubTime: str  # "2021-02-16T14:00+08:00",
-#     aqi: str  # "28",
-#     level: str  # "1",
-#     category: str  # "优",
-#     primary: str  # "NA",
-#     pm10: str  # "28",
-#     pm2p5: str  # "5",
-#     no2: str  # "3",
-#     so2: str  # "2",
-#     co: str  # "0.2",
-#     o3: str  # "76"
+class AirQualityNowColor(TypedDict):
+    red: int
+    green: int
+    blue: int
+    alpha: float
+
+
+class AirQualityNowPrimaryPollutant(TypedDict):
+    code: str | None  # "pm2p5",
+    name: str | None  # "PM 2.5",
+    fullName: str | None  # "颗粒物（粒径小于等于2.5µm）",
 
 
 class AirQualityNowAqiHealthAdvice(TypedDict):
@@ -107,15 +103,15 @@ class AirQualityNowAqiHealth(TypedDict):
     advice: AirQualityNowAqiHealthAdvice
 
 
-class AirQualityNowAqi(TypedDict):
-    code: str  # "cn-mee-1h",
-    name: str  # "AQI-1H (CN)",
-    defaultLocalAqi: bool  # true,
-    value: int  # 37,
-    valueDisplay: str  # "37",
+class AirQualityNowIndex(TypedDict):
+    code: str  # "qaqi",
+    name: str  # "QAQI",
+    aqi: float  # 0.9,
+    aqiDisplay: str  # "0.9",
     level: str | None  # "1",
-    category: str | None  # "优",
-    color: str | None  # "0,228,0",
+    category: str | None  # "Excellent",
+    color: AirQualityNowColor
+    primaryPollutant: AirQualityNowPrimaryPollutant
     health: AirQualityNowAqiHealth
 
 
@@ -125,8 +121,9 @@ class AirQualityNowPollutantConcentration(TypedDict):
 
 
 class AirQualityNowPollutantSubIndex(TypedDict):
-    value: int | None  # 37,
-    valueDisplay: str  # "37"
+    code: str | None  # "qaqi",
+    aqi: float | None  # 0.1,
+    aqiDisplay: str  # "0.1"
 
 
 class AirQualityNowPollutant(TypedDict):
@@ -137,11 +134,17 @@ class AirQualityNowPollutant(TypedDict):
     subIndex: AirQualityNowPollutantSubIndex
 
 
-class AirQualityNow(TypedDict):
-    """https://dev.qweather.com/docs/api/air-quality/air-now/"""
+class AirQualityNowStation(TypedDict):
+    id: str  # "P51762",
+    name: str  # "North Holywood",
 
-    aqi: list[AirQualityNowAqi]
-    pollutant: list[AirQualityNowPollutant]
+
+class AirQualityNow(TypedDict):
+    """https://dev.qweather.com/docs/api/air-quality/air-current/"""
+
+    indexes: list[AirQualityNowIndex]
+    pollutants: list[AirQualityNowPollutant]
+    stations: list[AirQualityNowStation]
 
 
 class MinutelyPrecipitationItem(TypedDict):

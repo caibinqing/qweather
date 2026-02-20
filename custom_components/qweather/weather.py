@@ -199,7 +199,7 @@ class QWeatherEntity(CoordinatorWeatherEntity):
     @callback
     def _update_air_now(self, air_now: AirQualityNow | None) -> None:
         if air_now:
-            for pollutant in air_now["pollutant"]:
+            for pollutant in air_now["pollutants"]:
                 if pollutant["code"] == "o3":
                     self._attr_ozone = pollutant["concentration"]["value"]
                     return

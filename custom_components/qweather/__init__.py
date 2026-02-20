@@ -11,7 +11,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, TimestampDataUpdateCoordinator
 
 from .api import QWeatherClient
-from .const import CONF_API_HOST, CONF_GRID, CONF_LOCATION_ID
+from .const import CONF_API_HOST, CONF_GRID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,13 +29,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: QWeatherConfigEntry) -> 
 
     api_host: str = entry.data[CONF_API_HOST]
     api_key: str = entry.data[CONF_API_KEY]
-    longitude: float = round(entry.data[CONF_LONGITUDE], 2)
-    latitude: float = round(entry.data[CONF_LATITUDE], 2)
+    longitude: str = str(round(entry.data[CONF_LONGITUDE], 2))
+    latitude: str = str(round(entry.data[CONF_LATITUDE], 2))
     grid_weather: bool = entry.options.get(CONF_GRID, True)
-    location_id = entry.data[CONF_LOCATION_ID]
 
     session = async_create_clientsession(hass, timeout=ClientTimeout(total=20))
-    client = QWeatherClient(session, api_host, api_key, f"{longitude},{latitude}", location_id, grid_weather)
+    client = QWeatherClient(session, api_host, api_key, longitude, latitude, grid_weather)
     entry.runtime_data = coordinators = Coordinators(hass, client)
 
     for coordinator in coordinators.__dict__.values():

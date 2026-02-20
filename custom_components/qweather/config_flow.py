@@ -10,7 +10,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 
-from .const import CONF_API_HOST, CONF_GRID, CONF_LOCATION_ID, DOMAIN
+from .const import CONF_API_HOST, CONF_GRID, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,9 +36,6 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
             session = async_get_clientsession(self.hass)
             resp = await session.get(geo_url, params=params)
             if resp.status == HTTPStatus.OK:
-                json_data = await resp.json()
-                _LOGGER.debug(json_data)
-                location_id = json_data["location"][0]["id"]
                 # noinspection PyTypeChecker
                 return self.async_create_entry(
                     title=user_input[CONF_NAME],
@@ -48,7 +45,6 @@ class QWeatherFlowHandler(ConfigFlow, domain=DOMAIN):
                         CONF_API_KEY: user_input[CONF_API_KEY],
                         CONF_LONGITUDE: user_input[CONF_LONGITUDE],
                         CONF_LATITUDE: user_input[CONF_LATITUDE],
-                        CONF_LOCATION_ID: location_id,
                     },
                     options={
                         CONF_GRID: use_grid,

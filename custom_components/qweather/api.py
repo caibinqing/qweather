@@ -29,15 +29,16 @@ class QWeatherClient:
         session: ClientSession,
         api_host: str,
         api_key: str,
-        location: str,  # longitude,latitude
-        location_id: str,
+        longitude: str,
+        latitude: str,
         grid_weather: bool,
     ) -> None:
         super().__init__()
         self.api_host = api_host
         self.http = session
-        self.params = {"location": location, "key": api_key}
-        self.location_id = location_id
+        self.params = {"location": f"{longitude},{latitude}", "key": api_key}
+        self.longitude = longitude
+        self.latitude = latitude
         self.weather_type = "grid-weather" if grid_weather else "weather"
 
     async def update_observation(self) -> RealtimeWeather | None:
@@ -57,10 +58,7 @@ class QWeatherClient:
 
     async def update_air_now(self) -> AirQualityNow | None:
         """空气质量-实时空气质量"""
-        if not self.location_id:
-            return None
-        json_data = await self.api_get(f"airquality/v1/now/{self.location_id}")
-        return json_data.get("now") if json_data else None
+        return await self.api_get(f"airquality/v1/current/{self.latitude}/{self.longitude}")
 
     async def update_minutely_precipitation(self) -> MinutelyPrecipitation:
         """分钟预报-分钟级降水"""
@@ -82,7 +80,7 @@ class QWeatherClient:
     async def update_indices_1d(self) -> list[IndicesDailyItem]:
         """天气指数-天气指数预报"""
         json_data = await self.api_get_v7("indices/1d", {"type": "0"})
-        return json_data.get("daily") if json_data else []
+        return json_data.get("daily", []) if json_data else []
 
     async def api_get_v7(self, api: str, extra_params: Mapping[str, str] | None = None) -> dict | None:
         return await self.url_get(f"https://{self.api_host}/v7/{api}", extra_params)
@@ -101,42 +99,44 @@ class QWeatherClient:
             if not json_data:
                 _LOGGER.warning("Empty response from: %s", url)
                 return None
-            code = json_data.get("code")
-            if code != "200":  # v1 error code
+            if "code" in json_data and json_data["code"] != "200":  # v1 error code
                 self._wait_until = parse_v1_error(json_data)
                 return None
             return json_data
         if response.status == HTTPStatus.BAD_REQUEST:
+            _LOGGER.error("%s %s", response.status, url)
             json_data = await response.json()
-            error = json_data.get("error")
-            _LOGGER.error(error["detail"])
+            if error := json_data["error"]:
+                if "invalidParams" in error:
+                    _LOGGER.error("%s invalidParams:%s (%s)", error["detail"], error["invalidParams"], error["type"])
+                else:
+                    _LOGGER.error("%s (%s)", error["detail"], error["type"])
             self._wait_until = math.inf
             return None
         if response.status == HTTPStatus.UNAUTHORIZED:
-            _LOGGER.error(
-                "401 认证失败，可能使用了错误的KEY、数字签名错误、KEY的类型错误（如使用SDK的KEY去访问Web API）。"
-            )
+            _LOGGER.error("%s %s", response.status, url)
             self._wait_until = math.inf
             return None
         if response.status == HTTPStatus.FORBIDDEN:
-            _LOGGER.error(
-                "403 无访问权限，可能是绑定的PackageName、BundleID、域名IP地址不一致，或者是需要额外付费的数据。"
-            )
+            _LOGGER.error("%s %s", response.status, url)
+            json_data = await response.json()
+            if error := json_data["error"]:
+                _LOGGER.error("%s (%s)", error["detail"], error["type"])
             self._wait_until = math.inf
             return None
         if response.status == HTTPStatus.NOT_FOUND:
-            _LOGGER.error("404 查询的数据或地区不存在。 %s", url)
+            _LOGGER.error("%s %s", response.status, url)
             self._wait_until = math.inf
             return None
         if response.status == HTTPStatus.TOO_MANY_REQUESTS:
-            _LOGGER.warning("429 超过限定的QPM（每分钟访问次数）")
+            _LOGGER.error("%s %s", response.status, url)
             self._wait_until = datetime.now().timestamp() + 60
             return None
         if response.status == HTTPStatus.INTERNAL_SERVER_ERROR:
-            _LOGGER.warning("500 无响应或超时，接口服务异常")
+            _LOGGER.error("%s %s", response.status, url)
             self._wait_until = datetime.now().timestamp() + 60
             return None
-        _LOGGER.error("HTTP Status: %s", response.status)
+        _LOGGER.error("%s %s", response.status, url)
         self._wait_until = datetime.now().timestamp() + 600
         return None
 
